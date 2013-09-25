@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+#wrapper{
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(true,sizingMethod=scale);
+}
+
+</style>
+
+<script type="text/javascript">
+	var getPath = function(obj,img){
+		if (typeof FileReader === "undefined") { //判断浏览器是否有FileReader接口
+            // IE7以上出于安全性的考虑，上传文件时屏蔽了真实的本地文件路径，而以“C:\fakepath\”取代之
+            obj.select();
+            obj.blur(); //解决IE9下document.selection拒绝访问的错误
+            
+            // document.selection 表示当前网页中的选中内容
+            // document.selection.createRange() 根据当前文字选择返回 TextRange 对象，或根据控件选择返回ControlRange 对象。
+            var path=document.selection.createRange().text;
+            
+            // 使用滤镜本地预览成功率高，设置src为绝对路径的方式 有些图片无法显示，效果没有使用滤镜好
+            // img.src = "file:///"+path; // 本地测试Ok,http下无法显示图片
+            
+            // 但特别注意的是该滤镜效果使用的对象是div对象，并非img对象，因此我们需要将原有的img对象remove。如果要对img对象使用滤镜，需要使用一个透明图片作为Img的src
+            
+            var dom = document.getElementById("wrapper");
+            dom.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(true,sizingMethod = scale;)";
+            dom.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = path;
+            dom.innerHTML = "";
+        }
+
+        else { // 在FF7中,getAsDataURL已经不再被支持了，高级浏览器支持FileReader
+        
+            var file =obj.files[0];  
+            var reader = new FileReader();  
+            reader.onload = function(e){
+                img.setAttribute("src",e.target.result)
+            }
+            reader.readAsDataURL(file);  
+
+        }
+	};
+	var preview = function(obj) {
+        var img = document.getElementById("img");
+		getPath(obj,img);
+	}
+	
+</script>
+</head>
+<body>
+<input id="file" type="file" accept="image/*" onchange="preview(this);"/>
+<div id="wrapper" style="width:200px;height:200px;border:1px solid #000000;">
+    <img id="img" src="nopic.jpg" />
+</div>
+</body>
+</html>
